@@ -1,0 +1,9 @@
+{
+  "bold": "bold.nii.gz",
+  "mask": "mask.nii.gz",
+  "confounds": "confounds.tsv",
+  "tr": "",
+  "fd_thres": 0.5,
+  "fwhm": 5,
+  "hpass_cutoff": 0.0078
+}

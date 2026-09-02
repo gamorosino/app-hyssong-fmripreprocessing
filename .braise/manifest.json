@@ -1,0 +1,99 @@
+{
+  "name": "hyssong-fmripreprocessing",
+  "github": "gamorosino/app-hyssong-fmripreprocessing",
+  "github_branch": "main",
+  "desc": "Post-fMRIPrep nuisance regression and smoothing (AFNI/FSL), ported from Hayoung Song's fmripreprocessing notebook",
+  "config": {
+    "bold": {
+      "type": "input",
+      "file_id": "bold",
+      "input_id": "bold"
+    },
+    "mask": {
+      "type": "input",
+      "file_id": "mask",
+      "input_id": "mask"
+    },
+    "confounds": {
+      "type": "input",
+      "file_id": "regressors",
+      "input_id": "confounds"
+    },
+    "tr": {
+      "id": "tr",
+      "type": "number",
+      "placeholder": "",
+      "advanced": false,
+      "desc": "Repetition time (seconds) of the BOLD acquisition",
+      "default": ""
+    },
+    "fd_thres": {
+      "id": "fd_thres",
+      "type": "number",
+      "placeholder": "",
+      "advanced": false,
+      "desc": "Framewise displacement threshold (mm) used to flag/censor high-motion frames",
+      "default": 0.5
+    },
+    "fwhm": {
+      "id": "fwhm",
+      "type": "number",
+      "placeholder": "",
+      "advanced": false,
+      "desc": "Full-width half-max (mm) of the spatial smoothing kernel applied at the end",
+      "default": 5
+    },
+    "hpass_cutoff": {
+      "id": "hpass_cutoff",
+      "type": "number",
+      "placeholder": "",
+      "advanced": true,
+      "desc": "High-pass filter cutoff frequency in Hz (default 0.0078 Hz corresponds to a 128s period)",
+      "default": 0.0078
+    }
+  },
+  "inputs": [
+    {
+      "id": "bold",
+      "desc": "fMRIPrep-preprocessed BOLD (space-MNI152NLin2009cAsym, desc-preproc)",
+      "datatype": "neuro/func/task",
+      "datatype_tags": [],
+      "optional": false,
+      "multi": false,
+      "advanced": false
+    },
+    {
+      "id": "mask",
+      "desc": "Brain mask matching the BOLD input (from fMRIPrep)",
+      "datatype": "neuro/mask",
+      "datatype_tags": [
+        "func"
+      ],
+      "optional": false,
+      "multi": false,
+      "advanced": false
+    },
+    {
+      "id": "confounds",
+      "desc": "fMRIPrep confounds regressors.tsv for the same BOLD run",
+      "datatype": "neuro/regressors",
+      "datatype_tags": [],
+      "optional": false,
+      "multi": false,
+      "advanced": false
+    }
+  ],
+  "outputs": [
+    {
+      "id": "preproc_bold",
+      "desc": "Brain-masked, intensity-normalized, nuisance-regressed (24 motion parameters + WM + CSF + global signal + high-pass), and spatially smoothed BOLD, ready for functional-connectivity analyses.",
+      "datatype": "neuro/func/task",
+      "datatype_tags": [
+        "denoised",
+        "preprocessed"
+      ],
+      "datatype_tags_pass": "bold",
+      "archive": true
+    }
+  ]
+}
