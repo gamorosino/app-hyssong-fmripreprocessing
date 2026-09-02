@@ -16,7 +16,16 @@ mkdir -p preproc_bold
 export SINGULARITYENV_LC_ALL=C.UTF-8
 export SINGULARITYENV_LANG=C.UTF-8
 
-singularity exec -e --no-mount passwd,group docker://nipreps/fmriprep:20.2.3 python3 main.py
+# This host's NSS user/group entries make Singularity/Apptainer's automatic
+# /etc/passwd|group injection emit a malformed line, which crashes Python's
+# startup inside the container. Supply well-formed replacements ourselves,
+# built only from numeric ids (never from NSS text fields).
+fake_passwd="$(pwd)/.fake_passwd"
+fake_group="$(pwd)/.fake_group"
+echo "brlife:x:$(id -u):$(id -g):brlife:/tmp:/bin/bash" > "$fake_passwd"
+echo "brlife:x:$(id -g):" > "$fake_group"
+
+singularity exec -e --bind "$fake_passwd:/etc/passwd" --bind "$fake_group:/etc/group" docker://nipreps/fmriprep:20.2.3 python3 main.py
 
 [ -z "$(ls -A preproc_bold)" ] && echo "no output produced" && exit 1
 exit 0
