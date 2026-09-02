@@ -89,6 +89,9 @@ def main():
     run(["fslmaths", masked, "-inm", "10000", normalized])
 
     # ------ 3. high-pass filter regressors ------ #
+    # `1d_tool.py -write` here only strips 1dBport's comment lines into a
+    # clean numeric table; the container's bundled 1d_tool.py is a Python 2
+    # script that crashes under Python 3, so do that reformatting directly.
     hpass_raw = os.path.join(out_dir, "tmp_rm.hpass.1D")
     with open(hpass_raw, "w") as f:
         subprocess.run(
@@ -96,7 +99,10 @@ def main():
             check=True, stdout=f,
         )
     hpass_1d = os.path.join(out_dir, "highpass_regressors.1D")
-    run(["1d_tool.py", "-infile", hpass_raw, "-write", hpass_1d])
+    with open(hpass_raw) as src, open(hpass_1d, "w") as dst:
+        for line in src:
+            if not line.lstrip().startswith("#") and line.strip():
+                dst.write(line)
     os.remove(hpass_raw)
 
     # ------ 4. combined design matrix ------ #
