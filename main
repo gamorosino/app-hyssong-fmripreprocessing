@@ -16,12 +16,13 @@ mkdir -p preproc_bold
 export SINGULARITYENV_LC_ALL=C.UTF-8
 export SINGULARITYENV_LANG=C.UTF-8
 
-# Bare "python3" on this image can resolve to a minimal system Python that
-# lacks usable locale data and crashes on startup. brainlife's own
-# app-fmriprep main script never invokes bare python3 either -- it always
-# runs the image's bundled conda Python (that's what actually ran fMRIPrep
-# successfully earlier in this same project). Use the same one here.
-singularity exec -e docker://nipreps/fmriprep:20.2.3 /usr/local/miniconda/bin/python main.py
+# This resource's shared /mnt/scratch/docker-cache has a corrupted cached
+# sandbox extraction for docker://nipreps/fmriprep:20.2.3 (its /etc/passwd
+# is unreadable garbage, crashing the container's Python at startup on any
+# node sharing that cache -- confirmed identical on two different brainlife
+# resources). Reference the same image by digest instead of tag so
+# Singularity/Apptainer computes a fresh, distinct cache entry.
+singularity exec -e docker://nipreps/fmriprep@sha256:102db5fe8b0a34298f2eb2fd5962ad99ff0a948d258cbf08736fcc1b845cad9f /usr/local/miniconda/bin/python main.py
 
 [ -z "$(ls -A preproc_bold)" ] && echo "no output produced" && exit 1
 exit 0
